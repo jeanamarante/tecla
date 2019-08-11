@@ -1317,11 +1317,11 @@ const shortcutKeyNamesDict = {
 };
 
 const shortcutKeyCodesDict = {
-    '16': true,
-    '17': true,
-    '18': true,
-    '91': true,
-    '93': true
+    '16': true, // shift
+    '17': true, // ctrl
+    '18': true, // alt
+    '91': true, // select key
+    '93': true  // left window key
 };
 
 // Find key codes with key names.
