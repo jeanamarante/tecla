@@ -7,42 +7,61 @@ tecla is a small library that mimics desktop shortcut APIs in the browser.
 
 &nbsp;
 
-## API
+## Key Events
 
+__up__
 
-### Example
+Key up events are invoked once after key down and key press events.
+
+__down__
+
+Key down events are invoked repeatedly for as long as keys are pressed down. Invoked before key press and key up event.
 
 ```js
-// Default context.
+TECLA.listenKeyDown(null, function goUp (e) {}, 'up arrow');
+TECLA.listenKeyDown(null, function goDown (e) {}, 'down arrow');
+TECLA.listenKeyDown(null, function goLeft (e) {}, 'left arrow');
+TECLA.listenKeyDown(null, function goRight (e) {}, 'right arrow');
+```
 
-// Ommit function bodies for brevity.
-function onUpArrowKeyDown (e : KeyboardEvent) {}
-function onDownArrowKeyDown (e : KeyboardEvent) {}
-function onLeftArrowKeyDown (e : KeyboardEvent) {}
-function onRightArrowKeyDown (e : KeyboardEvent) {}
+__press__
 
-// Unlike other events, multiple downed key listeners can be
-// invoked at the same time.
-TECLA.listenKeyDown(null, onUpArrowKeyDown, 'up arrow');
-TECLA.listenKeyDown(null, onDownArrowKeyDown, 'down arrow');
-TECLA.listenKeyDown(null, onLeftArrowKeyDown, 'left arrow');
-TECLA.listenKeyDown(null, onRightArrowKeyDown, 'right arrow');
+Key press events are invoked once after key down events.
 
+__multi press__
+
+Multi key press events are invoked after a sequence of keys are pressed once. Multi key listeners are allowed to register a maximum of six unique key names at the same time due to hardware limitations and practicality. Shortcut key names in array must be declared before normal keys or listener will not be registered.
+
+```js
 // Using the SHORTCUT_KEY_ROOT constant keeps the sequence compatible
 // with multiple platforms.
 
-// Zoom even if the user is typing in a text field by declaring
-// ignoreFocusedTextInput true.
+// Zoom window even if the user is typing in a text field by
+// declaring ignoreFocusedTextInput true.
+
+function onZoom (e) {}
 
 TECLA.listenMultiKeyPress(null, onZoom, [TECLA.SHORTCUT_KEY_ROOT, 'equal sign'], true);
+```
 
-// Overlay context.
+__context__
 
+Handle different states with the same keys.
+
+```js
 let overlayPanel = {
-    hide: function () {},
+	show: function () {
+    	// Only listeners in overlay context will be invoked now.
+        TECLA.setContext('overlay');
+    },
 
-    // Latest keyboard event will be the only argument passed in all callbacks.
-    onEscapeKeyPress: function (e : KeyboardEvent) {
+    hide: function () {
+        // Revert back to default context.
+        TECLA.setDefaultContext();
+    },
+
+    // The latest keyboard event is the one passed as an argument in all callbacks.
+    onEscapeKeyPress: function (e) {
     	e.preventDefault();
 
     	this.hide();
@@ -53,15 +72,16 @@ let overlayPanel = {
 // will be invoked with the listeners scope.
 
 // When context name is declared as an non-empty string, method will
-// add context if it does not exist and is non-empty string.
+// add context automatically if it does not exist.
 
 TECLA.listenKeyPress(overlayPanel, overlayPanel.onEscapeKeyPress, 'escape', false, 'overlay');
 
-// Only listeners in overlay context will be invoked.
-TECLA.setContext('overlay');
+overlayPanel.show();
 ```
 
 &nbsp;
+
+## API
 
 ### Constants
 
@@ -85,7 +105,7 @@ TECLA.SHORTCUT_KEY_ROOT : String
 
 __isTextInputFocused__
 
-Check if there is a focused text input element in the DOM. Useful when trying to determine if a keyboard event should not be invoked when user is typing in an text input field.
+Checks if any `input[type="text"]` or `textarea` element is focused in the DOM. Useful when trying to determine if a keyboard event should not be invoked when user is typing in a text input field.
 
 ```js
 TECLA.isTextInputFocused () : Boolean
@@ -218,49 +238,49 @@ TECLA.getCurrentContextName () : String
 __listenKeyUp__
 
 ```js
-TECLA.listenKeyUp(listener: Object|Null, callback: Function, keyName: String, ignoreFocusedTextInput: Boolean = false, contextName: String = 'default')
+TECLA.listenKeyUp (listener: Object|Null, callback: Function, keyName: String, ignoreFocusedTextInput: Boolean = false, contextName: String = 'default')
 ```
 
 __stopListeningKeyUp__
 
 ```js
-TECLA.stopListeningKeyUp(listener: Object|Null, callback: Function, keyName: String, contextName: String = 'default')
+TECLA.stopListeningKeyUp (listener: Object|Null, callback: Function, keyName: String, contextName: String = 'default')
 ```
 
 __listenKeyDown__
 
 ```js
-TECLA.listenKeyDown(listener: Object|Null, callback: Function, keyName: String, ignoreFocusedTextInput: Boolean = false, contextName: String = 'default')
+TECLA.listenKeyDown (listener: Object|Null, callback: Function, keyName: String, ignoreFocusedTextInput: Boolean = false, contextName: String = 'default')
 ```
 
 __stopListeningKeyDown__
 
 ```js
-TECLA.stopListeningKeyDown(listener: Object|Null, callback: Function, keyName: String, contextName: String = 'default')
+TECLA.stopListeningKeyDown (listener: Object|Null, callback: Function, keyName: String, contextName: String = 'default')
 ```
 
 __listenKeyPress__
 
 ```js
-TECLA.listenKeyPress(listener: Object|Null, callback: Function, keyName: String, ignoreFocusedTextInput: Boolean = false, contextName: String = 'default')
+TECLA.listenKeyPress (listener: Object|Null, callback: Function, keyName: String, ignoreFocusedTextInput: Boolean = false, contextName: String = 'default')
 ```
 
 __stopListeningKeyPress__
 
 ```js
-TECLA.stopListeningKeyPress(listener: Object|Null, callback: Function, keyName: String, contextName: String = 'default')
+TECLA.stopListeningKeyPress (listener: Object|Null, callback: Function, keyName: String, contextName: String = 'default')
 ```
 
 __listenMultiKeyPress__
 
 ```js
-TECLA.listenKeyPress(listener: Object|Null, callback: Function, keyNames: String[], ignoreFocusedTextInput: Boolean = false, contextName: String = 'default')
+TECLA.listenMultiKeyPress (listener: Object|Null, callback: Function, keyNames: String[], ignoreFocusedTextInput: Boolean = false, contextName: String = 'default')
 ```
 
 __stopListeningMultiKeyPress__
 
 ```js
-TECLA.stopListeningKeyPress(listener: Object|Null, callback: Function, keyNames: String[], contextName: String = 'default')
+TECLA.stopListeningMultiKeyPress (listener: Object|Null, callback: Function, keyNames: String[], contextName: String = 'default')
 ```
 
 __getKeyName__
@@ -273,7 +293,7 @@ TECLA.getKeyName (keyCode: Number) : String
 
 ### Key Names
 
-All key names and codes used internally.
+All key names used internally.
 
 ```js
 {
