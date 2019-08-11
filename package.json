@@ -1,0 +1,28 @@
+{
+    "name": "tecla",
+    "description": "Keyboard Helper for the Web",
+    "version": "1.0.0",
+    "author": {
+        "name": "Jean Amarante",
+        "url": "https://github.com/jeanamarante"
+    },
+    "repository": {
+        "type": "git",
+        "url": "https://github.com/jeanamarante/tecla"
+    },
+    "bugs": {
+        "url": "https://github.com/jeanamarante/tecla/issues"
+    },
+    "license": "MIT",
+    "devDependencies": {
+        "terser": "^4.1.0"
+    },
+    "keywords": [
+        "tecla",
+        "plugin",
+        "keyboard"
+    ],
+    "scripts": {
+        "terser": "terser dist/tecla.js -o dist/tecla.min.js -c -m --mangle-props keep_quoted --ecma 6"
+    }
+}
